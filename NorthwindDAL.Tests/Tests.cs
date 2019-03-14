@@ -11,43 +11,46 @@ namespace NorthwindDAL.Tests
     public class Tests
     {
         const string ConnectionString =
-           @"data source=EPBYGROW0110;initial catalog=Northwind;integrated security=True;MultipleActiveResultSets=True";
+            @"data source=EPBYGROW0110;initial catalog=Northwind;integrated security=True;MultipleActiveResultSets=True";
 
         const string ProviderName = "System.Data.SqlClient";
+
         IOrderRepository repository;
+
         [TestInitialize]
-        public void Init()
+        public void Test_Initialization()
         {
             repository = new OrderRepository(ConnectionString, ProviderName);
         }
+
         [TestMethod]
-        public void GetAllOrders_Tests()
+        public void Test_IsTrueResult_For_GetAllOrders()
         {
-            
+
             var actualResult = repository.GetAll();
 
             Assert.IsTrue(actualResult.Any());
         }
 
         [TestMethod]
-        public void GetByID_Tests()
+        public void Test_IsNotNullResult_GetOrderByID()
         {
-          
+
             var actualResult = repository.GetByID(10280);
 
             Assert.IsNotNull(actualResult);
         }
 
         [TestMethod]
-        public void Create_Tests()
+        public void Test_IsNotNullResult_CreateNewOrder()
         {
 
             var newItem = new Order
             {
                 Freight = 100500,
                 CustomerId = "OTTIK",
-                ShipPostalCode = "!!!",
-                ShipName = "!!!!!!!!111111"
+                ShipPostalCode = "123",
+                ShipName = "testname"
             };
 
             newItem = repository.Create(newItem);
@@ -57,7 +60,7 @@ namespace NorthwindDAL.Tests
 
 
         [TestMethod]
-        public void UpdateItemTest()
+        public void Test_AreEqualResult_For_Update_Order()
         {
             var expectedResult = repository.GetByID(repository.GetAll().First(x => x.Status == OrderStatus.New).Id);
             expectedResult.ShipName = "test";
@@ -74,9 +77,9 @@ namespace NorthwindDAL.Tests
         }
 
         [TestMethod]
-        public void MarkShippedTest()
+        public void Test_IsTrueResult_For_MarkShipped_Order()
         {
-            
+
             var item = repository.GetAll().LastOrDefault();
 
             if (item != null)
@@ -86,9 +89,9 @@ namespace NorthwindDAL.Tests
         }
 
         [TestMethod]
-        public void MarkArrivedTest()
+        public void Test_IsTrueResult_For_MarkArrived_Order()
         {
-           
+
             var item = repository.GetAll().LastOrDefault();
 
             if (item != null)
@@ -98,27 +101,27 @@ namespace NorthwindDAL.Tests
         }
 
         [TestMethod]
-        public void StatisticTest1()
+        public void Test_IsTrueGettingStatistics_ForOrder_By_StoredProcedure_CustOrderHist()
         {
-           
+
             var orders = repository.CustOrderHist("BOTTM");
 
             Assert.IsTrue(orders.Any());
         }
 
         [TestMethod]
-        public void StatisticTest2()
+        public void Test_IsTrueGettingStatistics_ForOrder_By_StoredProcedure_OrderDetails()
         {
-           
+
             var ordersDetails = repository.OrderDetails(10260);
 
             Assert.IsTrue(ordersDetails.Any());
         }
 
         [TestMethod]
-        public void DeleteItemTest()
+        public void Test_IsNullResult_For_Delete_Order()
         {
-           
+
 
             var item = repository.GetAll().FirstOrDefault();
 
