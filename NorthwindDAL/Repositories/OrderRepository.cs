@@ -23,12 +23,12 @@ namespace NorthwindDAL.Repositories
 
         public IEnumerable<Order> GetAll()
         {
-            var AllOrders = new List<Order>();
+            
             using (var connection = ProviderFactory.CreateConnection())
             {
                 if (connection == null)
                 {
-                    return AllOrders;
+                    throw new ArgumentNullException();
                 }
 
                 connection.ConnectionString = ConnectionString;
@@ -40,16 +40,13 @@ namespace NorthwindDAL.Repositories
                     {
                         while (reader.Read())
                         {
-                            var item = CreateOrderInstance(reader);
-                            AllOrders.Add(item);
+                            yield return CreateOrderInstance(reader); 
                         }
                         reader.NextResult();
-                       
-                      
                     }
                 }
             }
-            return AllOrders;
+            
         }
 
         public Order GetByID(int id)
