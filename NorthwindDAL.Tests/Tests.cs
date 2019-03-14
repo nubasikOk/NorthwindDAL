@@ -28,6 +28,7 @@ namespace NorthwindDAL.Tests
         {
 
             var actualResult = repository.GetAll();
+            
              Assert.IsTrue(actualResult.Any());
         }
 

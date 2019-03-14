@@ -42,7 +42,6 @@ namespace NorthwindDAL.Repositories
                         {
                             yield return CreateOrderInstance(reader); 
                         }
-                        reader.NextResult();
                     }
                 }
             }
