@@ -1,13 +1,11 @@
-﻿using System;
+﻿using NorthwindDAL.Entities;
+using NorthwindDAL.Entities.Enums;
+using NorthwindDAL.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NorthwindDAL.Entities;
-using NorthwindDAL.Entities.Enums;
-using NorthwindDAL.Models;
 
 namespace NorthwindDAL.Repositories
 {
@@ -174,7 +172,7 @@ namespace NorthwindDAL.Repositories
         }
         public  bool Delete(Order item)
         {
-            using (var connection = ProviderFactory.CreateConnection())
+            using (System.Data.SqlClient.SqlConnection connection = new System.Data.SqlClient.SqlConnection())
             {
                 if (connection == null)
                 {
@@ -183,18 +181,32 @@ namespace NorthwindDAL.Repositories
 
                 connection.ConnectionString = ConnectionString;
                 connection.Open();
-                using (var command = connection.CreateCommand())
+
+                var deleteDetailCommand = connection.CreateCommand();
+                var deleteOrderCommand = connection.CreateCommand();
+                deleteDetailCommand.CommandText = $"delete from [Order Details] where OrderID = @id";
+                var paramId1 = SqlBuilder.Create("@id", DbType.Int32, item.Id);
+                deleteDetailCommand.Parameters.Add(paramId1);
+                deleteOrderCommand.CommandText = $"delete from Orders where OrderID = @id";
+                var paramId2 = SqlBuilder.Create("@id", DbType.Int32, item.Id);
+                deleteOrderCommand.Parameters.Add(paramId2);
+                System.Data.SqlClient.SqlTransaction tx = null;
+                try
                 {
-                    command.CommandText = $"delete from [Order Details] where OrderID = @id";
-
-                    var paramId = SqlBuilder.Create("@id", DbType.Int32, item.Id);
-                    command.Parameters.Add(paramId);
-
-                    command.ExecuteNonQuery();
-
-                    command.CommandText = $"delete from Orders where OrderID = @id";
-
-                    command.ExecuteNonQuery();
+                    tx = connection.BeginTransaction();
+                   
+                    deleteDetailCommand.Transaction = tx;
+                    deleteOrderCommand.Transaction = tx;
+                    
+                    deleteDetailCommand.ExecuteNonQuery();
+                    deleteOrderCommand.ExecuteNonQuery();
+                    
+                    tx.Commit();
+                }
+                catch 
+                {
+                                     
+                    tx.Rollback();
                 }
             }
 
