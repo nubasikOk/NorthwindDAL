@@ -14,11 +14,7 @@ namespace NorthwindDAL.Repositories
         public static DbParameter Create(string paramName, DbType paramType, object value)
         {
             SqlParameter param = new SqlParameter(paramName, paramType);
-            if (value == null)
-                param.Value = DBNull.Value;
-            else
-                param.Value = value;
-
+            param.Value = value ?? DBNull.Value;
             return param;
         }
     }
